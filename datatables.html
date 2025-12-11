@@ -9,14 +9,13 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- DataTables CSS -->
-  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/2.3.5/css/dataTables.dataTables.min.css">
 
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
   <!-- DataTables JS -->
-  <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
+  <script src="//cdn.datatables.net/2.3.5/js/dataTables.min.js"></script>
 </head>
 <body class="container py-4">
 
@@ -24,57 +23,136 @@
 
 <!-- Tabs for two tables -->
 <ul class="nav nav-tabs" id="tableTabs" role="tablist">
-  <li class="nav-item" role="presentation">
+  <li class="nav-item">
     <button class="nav-link active" id="table1-tab" data-bs-toggle="tab" data-bs-target="#table1" type="button">Table 1</button>
   </li>
-  <li class="nav-item" role="presentation">
+  <li class="nav-item">
     <button class="nav-link" id="table2-tab" data-bs-toggle="tab" data-bs-target="#table2" type="button">Table 2</button>
   </li>
 </ul>
 
 <div class="tab-content mt-3">
-  <div class="tab-pane fade show active" id="table1" role="tabpanel">
-    <table id="datatable1" class="table table-striped table-bordered" style="width:100%"></table>
+  <!-- Table 1 -->
+  <div class="tab-pane fade show active" id="table1">
+    <div class="mb-2">
+      <label>Show/Hide Columns: </label>
+      <select class="form-select form-select-sm d-inline-block w-auto" id="toggleColumns1" multiple>
+        <option value="0" selected>Name</option>
+        <option value="1" selected>Position</option>
+        <option value="2" selected>Office</option>
+        <option value="3" selected>Age</option>
+        <option value="4" selected>Start date</option>
+        <option value="5" selected>Salary</option>
+      </select>
+    </div>
+    <table id="datatable1" class="table table-striped table-bordered" style="width:100%">
+      <thead>
+        <tr>
+          <th>Name</th><th>Position</th><th>Office</th><th>Age</th><th>Start date</th><th>Salary</th><th>Actions</th>
+        </tr>
+        <tr id="searchRow1">
+          <th><input type="text" placeholder="Search Name" class="form-control form-control-sm" /></th>
+          <th><input type="text" placeholder="Search Position" class="form-control form-control-sm" /></th>
+          <th><input type="text" placeholder="Search Office" class="form-control form-control-sm" /></th>
+          <th><input type="text" placeholder="Search Age" class="form-control form-control-sm" /></th>
+          <th><input type="text" placeholder="Search Start date" class="form-control form-control-sm" /></th>
+          <th><input type="text" placeholder="Search Salary" class="form-control form-control-sm" /></th>
+          <th></th>
+        </tr>
+      </thead>
+    </table>
   </div>
-  <div class="tab-pane fade" id="table2" role="tabpanel">
-    <table id="datatable2" class="table table-striped table-bordered" style="width:100%"></table>
+
+  <!-- Table 2 -->
+  <div class="tab-pane fade" id="table2">
+    <div class="mb-2">
+      <label>Show/Hide Columns: </label>
+      <select class="form-select form-select-sm d-inline-block w-auto" id="toggleColumns2" multiple>
+        <option value="0" selected>Name</option>
+        <option value="1" selected>Position</option>
+        <option value="2" selected>Office</option>
+        <option value="3" selected>Age</option>
+        <option value="4" selected>Start date</option>
+        <option value="5" selected>Salary</option>
+      </select>
+    </div>
+    <table id="datatable2" class="table table-striped table-bordered" style="width:100%">
+      <thead>
+        <tr>
+          <th>Name</th><th>Position</th><th>Office</th><th>Age</th><th>Start date</th><th>Salary</th><th>Actions</th>
+        </tr>
+        <tr id="searchRow2">
+          <th><input type="text" placeholder="Search Name" class="form-control form-control-sm" /></th>
+          <th><input type="text" placeholder="Search Position" class="form-control form-control-sm" /></th>
+          <th><input type="text" placeholder="Search Office" class="form-control form-control-sm" /></th>
+          <th><input type="text" placeholder="Search Age" class="form-control form-control-sm" /></th>
+          <th><input type="text" placeholder="Search Start date" class="form-control form-control-sm" /></th>
+          <th><input type="text" placeholder="Search Salary" class="form-control form-control-sm" /></th>
+          <th></th>
+        </tr>
+      </thead>
+    </table>
   </div>
 </div>
 
 <script>
 $(document).ready(function() {
-  const ajaxUrl = 'https://jsonplaceholder.typicode.com/users'; // example AJAX source
+  // Replace this with your own JSON data or AJAX URL
+  const ajaxUrl = 'data.json';
 
   const columns = [
-    { title: "ID", data: "id" },
     { title: "Name", data: "name" },
-    { title: "Username", data: "username" },
-    { title: "Email", data: "email" },
-    { title: "City", data: "address.city" },
-    { title: "Phone", data: "phone" },
-    { title: "Company", data: "company.name" }
+    { title: "Position", data: "position" },
+    { title: "Office", data: "office" },
+    { title: "Age", data: "age" },
+    { title: "Start date", data: "start_date" },
+    { title: "Salary", data: "salary" },
+    {
+      title: "Actions",
+      data: null,
+      defaultContent: "<button class='btn btn-sm btn-danger delete-btn'>Delete</button>",
+      orderable: false
+    }
   ];
 
-  function initTable(tableId) {
-    return $(tableId).DataTable({
+  function initTable(tableId, searchRowId, toggleSelectId) {
+    const table = $(tableId).DataTable({
       ajax: ajaxUrl,
       columns: columns,
       paging: true,
       pageLength: 5,
       lengthChange: true,
-      searching: false, // remove default search box
-      dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 text-center"p>>rt', // custom layout
+      searching: false, // remove default search
+      dom: '<"row"<"col-sm-12 text-center"p>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 text-start"i>>rt',
+      responsive: true
     });
+
+    // Column search
+    $(searchRowId + " input").on('keyup change', function() {
+      table.column($(this).parent().index()).search(this.value).draw();
+    });
+
+    // Delete row
+    $(tableId + ' tbody').on('click', '.delete-btn', function () {
+      table.row($(this).parents('tr')).remove().draw();
+    });
+
+    // Show/Hide columns
+    $(toggleSelectId).on('change', function() {
+      const colIndex = parseInt(this.value);
+      const col = table.column(colIndex);
+      col.visible(!col.visible());
+    });
+
+    return table;
   }
 
-  initTable('#datatable1');
-  initTable('#datatable2');
+  initTable('#datatable1', '#searchRow1', '#toggleColumns1');
+  initTable('#datatable2', '#searchRow2', '#toggleColumns2');
 });
 </script>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
- 
